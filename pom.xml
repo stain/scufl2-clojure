@@ -25,6 +25,11 @@
     		<name>myGrid Repository</name>
     		<url>http://www.mygrid.org.uk/maven/repository</url>
     	</repository>
+        <repository>
+            <id>clojars</id>
+            <name>Clojars</name>
+            <url>http://clojars.org/repo/</url>
+    </repository>
     </repositories>
 
     <dependencies>
@@ -57,6 +62,22 @@
             <artifactId>clojure</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.clojure</groupId>
+            <artifactId>clojure-contrib</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+               <groupId>jline</groupId>
+               <artifactId>jline</artifactId>
+               <version>0.9.94</version>
+        </dependency>
+        <dependency>
+            <groupId>vimclojure</groupId>
+            <artifactId>server</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
