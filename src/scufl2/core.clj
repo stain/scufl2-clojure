@@ -1,4 +1,4 @@
-(ns no.s11.scufl2
+(ns scufl2.core
   (:import (uk.org.taverna.scufl2.api.io WorkflowBundleIO) 
            (uk.org.taverna.scufl2.api.common URITools Scufl2Tools)
            (java.io File)
