@@ -2,5 +2,5 @@
   (:use [scufl2.core])
   (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (is false "No tests have been written."))
+(deftest read-bundle
+  (is (= "Hello_World" (.getName (read-wfbundle "test/helloworld.wfbundle")))))
