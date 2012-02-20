@@ -1,11 +1,10 @@
 (ns scufl2.core
+  (:use [clojure.java.io])
   (:import (uk.org.taverna.scufl2.api.io WorkflowBundleIO) 
            (uk.org.taverna.scufl2.api.common URITools Scufl2Tools)
-           (java.io File)
   )
 )
 
-(println "Hello")
 
 (def io (new WorkflowBundleIO))
 (def uri (new URITools))
@@ -14,14 +13,15 @@
 (def MIME-WFBUNDLE "application/vnd.taverna.scufl2.workflow-bundle")
 (def MIME-T2FLOW "application/vnd.taverna.t2flow+xml")
 
-(defn read-wfbundle 
+(defn read-bundle 
   "Read a Scufl2 workflow bundle from given filename"
   [filename] 
-  (.readBundle io (new File filename) nil))
+  (.readBundle io (file filename) nil))
 
-(defn write-wfbundle 
+(defn write-bundle 
   "Write a Scufl2 workflow bundle to given filename"
-  [filename] 
-  (.writeBundle io (new File filename) "application/vnd.taverna.scufl2.workflow-bundle"))
+  [bundle filename] 
+  (.writeBundle io bundle (file filename) "application/vnd.taverna.scufl2.workflow-bundle"))
+
 
 
