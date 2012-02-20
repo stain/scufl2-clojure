@@ -24,4 +24,8 @@
   (.writeBundle io bundle (file filename) "application/vnd.taverna.scufl2.workflow-bundle"))
 
 
+(defn bundle-structure
+  [bundle]
+  ; FIXME: dummy structure
+  '(wfbundle))
 
