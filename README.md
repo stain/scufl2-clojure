@@ -48,6 +48,5 @@ Running unit tests using [Leiningen](https://github.com/technomancy/leiningen):
 ## License
 
 * Copyright (C) 2012 Stian Soiland-Reyes
-* Copyright (C) 2012 The University of Manchester
 
 Distributed under the [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html), the same as Clojure.
