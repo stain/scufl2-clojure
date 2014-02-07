@@ -3,9 +3,9 @@
   :dependencies [
                  [org.clojure/clojure "1.4.0"]
 ;                 [org.clojure/clojure-contrib "1.4.0"]
-                 [uk.org.taverna.scufl2/scufl2-api "0.9.2"]
-                 [uk.org.taverna.scufl2/scufl2-rdfxml "0.9.2"]
-                 [uk.org.taverna.scufl2/scufl2-t2flow "0.9.2"]
+                 [uk.org.taverna.scufl2/scufl2-api "0.13.1"]
+                 [uk.org.taverna.scufl2/scufl2-rdfxml "0.13.1"]
+                 [uk.org.taverna.scufl2/scufl2-t2flow "0.13.1"]
 
                  
                  ;; optional
