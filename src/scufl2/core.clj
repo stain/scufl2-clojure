@@ -1,5 +1,6 @@
 (ns scufl2.core
   (:use [clojure.java.io])
+  (:use [clojure.core.async])
   (:import (uk.org.taverna.scufl2.api.io WorkflowBundleIO) 
            (uk.org.taverna.scufl2.api.common
               URITools Scufl2Tools Visitor Visitor$VisitorWithPath)
@@ -25,15 +26,24 @@
   (.writeBundle io bundle (file filename) "application/vnd.taverna.scufl2.workflow-bundle"))
 
 
+
+
 (defn bundle-structure
   [bundle]
   ; FIXME: dummy structure
 
-  (.accept bundle (proxy [Visitor$VisitorWithPath]
-             []
-             (visit [] 
-               (println "Visitting" (:currentNode (bean this)))
-               true)))
-
-  '(wfbundle))
+  (let [visits (chan)
+        visitor-thread (future
+          (.accept bundle (proxy [Visitor$VisitorWithPath]
+                    []
+                    (visit [] 
+                     ; (println "Visitting" (:currentNode (bean this)))
+                      (>!! visits (bean (:currentNode this))
+                     ; (println "Visitted")
+                      true))))
+          (close! visits))
+        objects (<!! (into [] visits))
+        _ @visitor-thread
+       ]
+      objects))
 
