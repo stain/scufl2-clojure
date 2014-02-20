@@ -1,6 +1,5 @@
 (ns scufl2.core
   (:use [clojure.java.io])
-  (:use [clojure.core.async])
   (:import (uk.org.taverna.scufl2.api.io WorkflowBundleIO) 
            (uk.org.taverna.scufl2.api.common
               URITools Scufl2Tools Visitor Visitor$VisitorWithPath)
@@ -32,18 +31,13 @@
   [bundle]
   ; FIXME: dummy structure
 
-  (let [visits (chan)
-        visitor-thread (future
-          (.accept bundle (proxy [Visitor$VisitorWithPath]
+  (let [stack (new java.util.ArrayList)
+        _ (.accept bundle (proxy [Visitor$VisitorWithPath]
                     []
                     (visit [] 
                      ; (println "Visitting" (:currentNode (bean this)))
-                      (>!! visits (bean (:currentNode this))
-                     ; (println "Visitted")
-                      true))))
-          (close! visits))
-        objects (<!! (into [] visits))
-        _ @visitor-thread
+                     (.add stack (bean (.getCurrentNode this)))
+                      true)))
        ]
-      objects))
+      stack))
 
