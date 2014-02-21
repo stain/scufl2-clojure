@@ -1,6 +1,7 @@
 (ns scufl2.core
   (:use [clojure.java.io])
   (:import (uk.org.taverna.scufl2.api.io WorkflowBundleIO) 
+           (java.text SimpleDateFormat)
            (uk.org.taverna.scufl2.api.common
               URITools Scufl2Tools Visitor Visitor$VisitorWithPath)
   )
@@ -24,20 +25,59 @@
   [bundle filename] 
   (.writeBundle io bundle (file filename) "application/vnd.taverna.scufl2.workflow-bundle"))
 
+(defn as-bean [obj]
+  (if (nil? obj) nil) 
+    (if (map? obj) obj (bean obj)))
 
+(defn name-of [named]
+  (if (nil? named) nil
+    (.getName named)))
 
+(defn str-or-nil [obj]
+  (if (nil? obj) nil (str obj)))
 
-(defn bundle-structure
-  [bundle]
-  ; FIXME: dummy structure
+(defn identified-to-clj [identified] 
+  { :name (.getName identified)
+    :identifier (str-or-nil (. identified getIdentifier))
+  }
+)
 
-  (let [stack (new java.util.ArrayList)
-        _ (.accept bundle (proxy [Visitor$VisitorWithPath]
-                    []
-                    (visit [] 
-                     ; (println "Visitting" (:currentNode (bean this)))
-                     (.add stack (bean (.getCurrentNode this)))
-                      true)))
-       ]
-      stack))
+(defn name-map [coll]
+  (zipmap (map :name coll) coll))
 
+(def ISO8601 (.SimpleDateFormat "yyyy-MM-dd HH:mm:ss.S z"))
+
+(def cal-as-iso8601 [cal]
+  (if (nil? cal) nil
+    (. iso8601 format (. cal getTime))))
+
+(defn revision-to-clj [revision]
+  (if (nil? revision) nil
+  {
+    :identifier (str-or-nil (. revision getIdentifier))
+    :previousRevision (revision-to-clj (.getPreviousRevision revision))
+    :changeSpecificationType ((.getChangeSpecificationType revision))
+    :generatedAtTime (cal-as-iso8601 (.getGeneratedAtTime revision))
+  }
+  )
+)
+
+(defn workflowbundle-to-clj [wfbundle]
+  (merge (identified-to-clj wfbundle)
+  { 
+    :mainWorkflow (name-of (.getMainWorkflow wfbundle))
+    :mainProfile (name-of (.getMainProfile wfbundle))
+    :workflows (name-map (map identified-to-clj (.getWorkflows wfbundle)))
+    :profiles (name-map (map identified-to-clj (.getProfiles wfbundle)))
+    :currentRevision (revision-to-clj (.getCurrentRevision wfbundle))
+  } )
+)
+
+(defn main-profile [wfbundle-struct]
+  (get (:profiles wfbundle-struct) (:mainProfile wfbundle-struct)))
+
+(defn main-workflow [wfbundle-struct]
+  (get (:workflows wfbundle-struct) (:mainWorkflow wfbundle-struct)))
+
+(defn bundle-structure [bundle]
+  (workflowbundle-to-clj bundle))
