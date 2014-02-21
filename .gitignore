@@ -11,3 +11,6 @@
 /.classpath
 /.settings
 /target
+.lein-repl-history
+.nrepl-port
+*.swp
