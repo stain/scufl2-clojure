@@ -2,8 +2,7 @@
   (:use [clojure.java.io])
   (:import 
            (uk.org.taverna.scufl2.api.io WorkflowBundleIO) 
-           (uk.org.taverna.scufl2.api.port DepthPort) 
-           (uk.org.taverna.scufl2.api.port GranularDepthPort) 
+           (uk.org.taverna.scufl2.api.port DepthPort GranularDepthPort WorkflowPort) 
            (java.text SimpleDateFormat)
            (uk.org.taverna.scufl2.api.common
               URITools Scufl2Tools Visitor Visitor$VisitorWithPath)
@@ -76,13 +75,25 @@
 (defn ported-to-clj [ported]
   (merge (named-to-clj ported)
   {
-    :inputs (name-map (map named-to-clj (.getInputPorts ported)))
-    :outputs (name-map (map named-to-clj (.getOutputPorts ported)))
+    :inputs (name-map (map port-to-clj (.getInputPorts ported)))
+    :outputs (name-map (map port-to-clj (.getOutputPorts ported)))
   }))
+
+
+(defn datalink-to-clj [dl]
+  (defn -port-tuple [port]
+    (list (if (instance? WorkflowPort port) nil
+        (.getName (.getParent port)))
+       (.getName port)))
+
+  (vector (-port-tuple (.getReceivesFrom dl)) (-port-tuple (.getSendsTo dl))))
 
 (defn workflow-to-clj [wf]
   (merge (identified-to-clj wf) (ported-to-clj wf)
-  { :processors (name-map (map ported-to-clj (.getProcessors wf))) }))
+  { :processors (name-map (map ported-to-clj (.getProcessors wf))) 
+    :dataLinks (set (map datalink-to-clj (.getDataLinks wf)))
+    :controlLinks (map datalink-to-clj (.getDataLinks wf))
+   }))
 
 (defn workflowbundle-to-clj [wfbundle]
   (merge (identified-to-clj wfbundle)
