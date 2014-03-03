@@ -2,6 +2,7 @@
   (:use [clojure.java.io])
   (:import 
            (uk.org.taverna.scufl2.api.io WorkflowBundleIO) 
+           (uk.org.taverna.scufl2.api.core BlockingControlLink) 
            (uk.org.taverna.scufl2.api.port DepthPort GranularDepthPort WorkflowPort) 
            (java.text SimpleDateFormat)
            (uk.org.taverna.scufl2.api.common
@@ -86,14 +87,26 @@
         (.getName (.getParent port)))
        (.getName port)))
 
-  (vector (-port-tuple (.getReceivesFrom dl)) (-port-tuple (.getSendsTo dl))))
+  (let [merge-pos (.getMergePosition dl)
+        link     (vector (-port-tuple (.getReceivesFrom dl)) (-port-tuple (.getSendsTo dl))) ]
+    (if (nil? merge-pos) link
+        (conj link merge-pos))))
+
+(defn controllink-to-clj[cl]
+  (if (not (instance? BlockingControlLink cl)) nil
+  (vector 
+    (.getName (.getUntilFinished cl)) 
+    (.getName (.getBlock cl)))))
 
 (defn workflow-to-clj [wf]
   (merge (identified-to-clj wf) (ported-to-clj wf)
   { :processors (name-map (map ported-to-clj (.getProcessors wf))) 
     :dataLinks (set (map datalink-to-clj (.getDataLinks wf)))
-    :controlLinks (map datalink-to-clj (.getDataLinks wf))
+    :controlLinks (map datalink-to-clj (.getControlLinks wf))
    }))
+
+;; TODO: Processors
+;; TODO: ITeration stack
 
 (defn workflowbundle-to-clj [wfbundle]
   (merge (identified-to-clj wfbundle)
@@ -104,6 +117,12 @@
     :profiles (name-map (map identified-to-clj (.getProfiles wfbundle)))
     :currentRevision (revision-to-clj (.getCurrentRevision wfbundle))
   }))
+
+;; TODO: Profiles
+;; TODO: Activities
+;; TODO: Processor bindings
+;; TODO: Configurations
+;; TODO: JSON configs
 
 (defn main-profile [wfbundle-struct]
   (get (:profiles wfbundle-struct) (:mainProfile wfbundle-struct)))
