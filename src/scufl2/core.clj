@@ -102,7 +102,7 @@
   (merge (identified-to-clj wf) (ported-to-clj wf)
   { :processors (name-map (map ported-to-clj (.getProcessors wf))) 
     :dataLinks (set (map datalink-to-clj (.getDataLinks wf)))
-    :controlLinks (map datalink-to-clj (.getControlLinks wf))
+    :controlLinks (set (map datalink-to-clj (.getControlLinks wf)))
    }))
 
 ;; TODO: Processors

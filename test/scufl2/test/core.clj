@@ -49,8 +49,13 @@
 
 (deftest test-workflow-to-clj
   (let [wf (workflow-to-clj (.getMainWorkflow (helloworld)))]
-      (is (= '() (:controlLinks wf))) 
-))
+      (is (= #{}
+            (:controlLinks wf)))
+      (print (:dataLinks wf))
+      (is (= #{(list ["hello" "value"] [nil "greeting"]) }
+             (:dataLinks wf))) 
+      (is (= '("hello" ) (keys (:processors wf))))
+    ))
 
 
 
